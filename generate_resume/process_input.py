@@ -89,3 +89,24 @@ def process_input(user_input):
 
     return data
 
+def build_structured_data(form_data):
+    """
+    Accepts dictionary-style structured input and returns the same format as process_input().
+    """
+    data = {
+        "name": form_data.get("name"),
+        "age": form_data.get("age"),
+        "gender": form_data.get("gender"),
+        "birthday": form_data.get("birthday"),
+        "location": form_data.get("location"),
+        "degree": form_data.get("degree"),
+        "major": form_data.get("major"),
+        "university": form_data.get("university"),
+        "bachelor_degree": form_data.get("bachelor_degree"),
+        "bachelor_major": form_data.get("bachelor_major"),
+        "bachelor_university": form_data.get("bachelor_university"),
+        "experiences": form_data.get("experiences", []),
+        "projects": form_data.get("projects", []),
+        "skills": form_data.get("skills", []),
+    }
+    return data
