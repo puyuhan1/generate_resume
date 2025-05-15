@@ -8,3 +8,4 @@ python main.py
 
 and you will see a small line of phrase asking for your information, and you could input a short paragraph of your own introduction and press enter.
 Important!!!: Current supported school include: Columbia University, Harvard, MIT, Stanford, UCBerkeley, and UCDavis.
+Important!!!: You'd better visualize .env file in the folder generate_resume and input your own Qwen api.
