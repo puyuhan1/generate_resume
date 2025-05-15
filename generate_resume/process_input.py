@@ -2,6 +2,7 @@ import re
 
 def process_input(user_input):
     data = {
+        "name": None,
         "degree": None,
         "major": None,
         "university": None,
@@ -9,8 +10,19 @@ def process_input(user_input):
         "bachelor_major": None,
         "bachelor_university": None,
         "experiences": [],
+        "projects": [],
         "skills": [],
+        "age": None,
+        "gender": None,
+        "birthday": None,
+        "location": None,
     }
+    # Naive name extraction if input starts with "My name is ..." or "I'm ..."
+    # Name extraction: match "my name is", "I am", or "I'm"
+    name_match = re.search(r"\b(?:my name is|i am|i'm)\s+([A-Z][a-z]+(?:\s[A-Z][a-z]+)+)", user_input, re.IGNORECASE)
+    if name_match:
+        data["name"] = name_match.group(1).strip().title()
+
 
     # Degree & Major (Master's)
     if "master" in user_input.lower():
@@ -18,14 +30,31 @@ def process_input(user_input):
         if match:
             data["degree"] = "Master's"
             data["major"] = match.group(1).strip()
-
+    
     # Degree & Major (Bachelor's)
     if "bachelor" in user_input.lower():
         match = re.search(r"bachelor.*?in ([\w\s]+)", user_input, re.IGNORECASE)
         if match:
             data["bachelor_degree"] = "Bachelor's"
             data["bachelor_major"] = match.group(1).strip()
+    gender_match = re.search(r"\b(male|female|non-binary|man|woman)\b", user_input, re.IGNORECASE)
+    if gender_match:
+        data["gender"] = gender_match.group(1).capitalize()
 
+# Age
+    age_match = re.search(r"\b(\d{1,2})\s*years old\b", user_input, re.IGNORECASE)
+    if age_match:
+        data["age"] = age_match.group(1)
+
+# Birthday
+    bday_match = re.search(r"\bborn on (\w+ \d{1,2}, \d{4})\b", user_input, re.IGNORECASE)
+    if bday_match:
+        data["birthday"] = bday_match.group(1)
+
+# Location
+    loc_match = re.search(r"\bfrom ([A-Za-z ,]+)", user_input, re.IGNORECASE)
+    if loc_match:
+         data["location"] = loc_match.group(1).strip()
     # University detection
     unis = ["Columbia University", "Harvard", "MIT", "Stanford", "Berkeley", "UCDavis"]
     for uni in unis:
@@ -47,7 +76,10 @@ def process_input(user_input):
     exp_match = re.findall(r"(interned at .+?[\.!?])", user_input, re.IGNORECASE)
     for match in exp_match:
         data["experiences"].append(match.strip())
-
+    
+    project_match = re.findall(r"(worked on|developed|built|created) .*?project.*?[\.]", user_input, re.IGNORECASE)
+    for match in project_match:
+        data["projects"].append(match.strip())
     # Skills extraction
     skills_match = re.search(r"skills? in ([\w\s,]+)", user_input, re.IGNORECASE)
     if skills_match:
@@ -56,3 +88,4 @@ def process_input(user_input):
         data["skills"] = skills_list
 
     return data
+

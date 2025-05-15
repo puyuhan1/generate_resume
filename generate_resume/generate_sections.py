@@ -1,4 +1,6 @@
 from llm_utils import polish_experience_bullet
+from llm_utils import polish_skills
+from llm_utils import clean_resume_text
 
 def generate_education(data):
     lines = []
@@ -25,34 +27,60 @@ def generate_education(data):
 
 def generate_experience(data):
     if data.get("experiences") and any(data["experiences"]):
-        print("📌 Polishing user-provided experience bullets...")
-        polished = [
-            polish_experience_bullet(exp, role="data analyst", skills=data.get("skills", []))
+        print("📌 Expanding user-provided experience bullets with Qwen...")
+        expanded = [
+            clean_resume_text(polish_experience_bullet(exp, role="data analyst", skills=data.get("skills", [])))
             for exp in data["experiences"]
         ]
-        return "Experience:\n" + "\n".join(f"  - {b}" for b in polished)
+        return "Experience:\n" + "\n\n".join(expanded)
     else:
-        print("📌 Generating fake experience based on major and skills...")
+        print("📌 Generating and expanding fake experience bullets...")
         fake_bullets = generate_fake_achievements(data.get("major", ""), data.get("skills", []))
-        polished = [
-            polish_experience_bullet(bullet, role="data analyst", skills=data.get("skills", []))
-            for bullet in fake_bullets
+        expanded = [
+            clean_resume_text(polish_experience_bullet(exp, role="data analyst", skills=data.get("skills", [])))
+            for exp in fake_bullets
         ]
-        return "Experience:\n" + "\n".join(polished)
+        return "Experience:\n" + "\n\n".join(expanded)
 
 
+def generate_projects(data):
+    if data.get("projects") and any(data["projects"]):
+        print("📌 Polishing project bullets with Qwen...")
+        polished = [
+            polish_experience_bullet(project, role="project contributor", skills=data.get("skills", []))
+            for project in data["projects"]
+        ]
+        return "Projects:\n" + "\n".join(f"  - {p}" for p in polished)
+    return ""
 
 def generate_skills(data):
-    if data.get("skills"):
-        return "Skills:\n  " + ", ".join(data["skills"])
-    else:
-        return "Skills:\n  - No skills listed."
+    skills = data.get("skills", [])
+    
+    if not skills or all(s.strip() == "" for s in skills):
+        print("📌 No skills provided. Generating default skills using Qwen...")
+        inferred_context = f"""
+Generate a list of professional skills based on the following background:
+Major: {data.get('major', 'Unknown')}
+Experience: {', '.join(data.get('experiences', []))}
+"""
+        try:
+            generated = polish_skills([inferred_context])
+            return "Skills:\n  " + generated
+        except:
+            return "Skills:\n  - Python, SQL, Microsoft Excel"
+    
+    print("📌 Polishing provided skills with Qwen...")
+    polished = clean_resume_text(polish_skills(skills))
+    return "Skills:\n  " + polished
 
 
 def generate_resume(data):
     sections = [
+        generate_name_header(data),
+        generate_personal_info(data),
         generate_education(data),
         generate_experience(data),
+        generate_projects(data),
         generate_skills(data),
     ]
     return "\n\n".join(section for section in sections if section.strip())
@@ -99,3 +127,22 @@ def generate_fake_achievements(major, skills):
     # Default fallback
     bullets.append("  - Led end-to-end development of analytics projects using modern software tools to derive actionable insights.")
     return bullets
+def generate_personal_info(data):
+    lines = []
+
+    if data.get("age"):
+        lines.append(f"Age: {data['age']}")
+    if data.get("gender"):
+        lines.append(f"Gender: {data['gender']}")
+    if data.get("birthday"):
+        lines.append(f"Birthday: {data['birthday']}")
+    if data.get("location"):
+        lines.append(f"Location: {data['location']}")
+
+    if not lines:
+        return ""
+
+    return "Personal Information:\n" + "\n".join(f"  - {line}" for line in lines)
+def generate_name_header(data):
+    name = data.get("name")
+    return name.upper() + "\n" if name else ""
