@@ -1,7 +1,7 @@
 import streamlit as st
 from process_input import process_input, build_structured_data
 from generate_sections import generate_resume
-
+from llm_utils import generate_cover_letter
 st.set_page_config(page_title="Resume Generator", layout="centered")
 
 st.title("📄 Resume Generator (Qwen-powered)")
@@ -15,7 +15,14 @@ if input_mode == "Freeform (text box)":
             resume = generate_resume(structured)
         st.subheader("🎯 Generated Resume")
         st.text(resume)
+    if st.button("Generate Cover Letter"):
+        job_title = st.text_input("Target Job Title (optional)")
+        company = st.text_input("Target Company (optional)")
 
+        with st.spinner("Generating cover letter..."):
+            cover_letter = generate_cover_letter(structured, job_title, company)
+        st.subheader("📬 Cover Letter")
+        st.text(cover_letter)
 else:
     with st.form("structured_form"):
         name = st.text_input("Full Name")

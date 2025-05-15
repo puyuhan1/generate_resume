@@ -78,3 +78,36 @@ def clean_resume_text(text):
     text = text.replace("---", "")
 
     return text.strip()
+
+def generate_cover_letter(data, job_title=None, company=None):
+    prompt = f"""Write a professional and concise cover letter in 3 paragraphs for a job application."""
+
+    if data.get("name"):
+        prompt += f"\nThe applicant's name is {data['name']}."
+    if job_title:
+        prompt += f"\nThe job title is {job_title}."
+    if company:
+        prompt += f"\nThe company is {company}."
+
+    # Summary of resume
+    if data.get("degree") or data.get("major"):
+        prompt += f"\nThe applicant is a student in {data.get('major', '')} with a {data.get('degree', '')}."
+    if data.get("experiences"):
+        prompt += f"\nThey have experience such as: {', '.join(data['experiences'][:2])}."
+    if data.get("skills"):
+        prompt += f"\nTheir skills include: {', '.join(data['skills'])}."
+
+    prompt += "\nMake it formal, enthusiastic, and specific to the job."
+
+    try:
+        response = client.chat.completions.create(
+            model="qwen-plus",
+            messages=[
+                {"role": "system", "content": "You are a helpful resume and cover letter assistant."},
+                {"role": "user", "content": prompt}
+            ],
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print("❌ Error generating cover letter:", str(e))
+        return "Cover letter could not be generated."
