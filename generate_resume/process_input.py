@@ -56,7 +56,7 @@ def process_input(user_input):
     if loc_match:
          data["location"] = loc_match.group(1).strip()
     # University detection
-    unis = ["Columbia University", "Harvard", "MIT", "Stanford", "Berkeley", "UCDavis"]
+    unis = ["Columbia University", "Harvard", "MIT", "Stanford", "UCBerkeley", "UCDavis"]
     for uni in unis:
         if uni.lower() in user_input.lower():
             if uni == "Columbia University":
@@ -67,7 +67,7 @@ def process_input(user_input):
                 data["university"] = "Massachusetts Institute of Technology"
             elif uni == "Stanford":
                 data["university"] = "Stanford University"
-            elif uni == "Berkeley":
+            elif uni == "UCBerkeley":
                 data["university"] = "UC Berkeley"
             elif uni == "UCDavis":
                 data["university"] = "UC Davis"

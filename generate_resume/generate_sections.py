@@ -27,14 +27,14 @@ def generate_education(data):
 
 def generate_experience(data):
     if data.get("experiences") and any(data["experiences"]):
-        print("📌 Expanding user-provided experience bullets with Qwen...")
+        print(" Expanding user-provided experience bullets with Qwen...")
         expanded = [
             clean_resume_text(polish_experience_bullet(exp, role="data analyst", skills=data.get("skills", [])))
             for exp in data["experiences"]
         ]
         return "Experience:\n" + "\n\n".join(expanded)
     else:
-        print("📌 Generating and expanding fake experience bullets...")
+        print(" Generating and expanding fake experience bullets...")
         fake_bullets = generate_fake_achievements(data.get("major", ""), data.get("skills", []))
         expanded = [
             clean_resume_text(polish_experience_bullet(exp, role="data analyst", skills=data.get("skills", [])))
@@ -45,7 +45,7 @@ def generate_experience(data):
 
 def generate_projects(data):
     if data.get("projects") and any(data["projects"]):
-        print("📌 Polishing project bullets with Qwen...")
+        print(" Polishing project bullets with Qwen...")
         polished = [
             polish_experience_bullet(project, role="project contributor", skills=data.get("skills", []))
             for project in data["projects"]
@@ -57,7 +57,7 @@ def generate_skills(data):
     skills = data.get("skills", [])
     
     if not skills or all(s.strip() == "" for s in skills):
-        print("📌 No skills provided. Generating default skills using Qwen...")
+        print(" No skills provided. Generating default skills using Qwen...")
         inferred_context = f"""
 Generate a list of professional skills based on the following background:
 Major: {data.get('major', 'Unknown')}
@@ -69,7 +69,7 @@ Experience: {', '.join(data.get('experiences', []))}
         except:
             return "Skills:\n  - Python, SQL, Microsoft Excel"
     
-    print("📌 Polishing provided skills with Qwen...")
+    print(" Polishing provided skills with Qwen...")
     polished = clean_resume_text(polish_skills(skills))
     return "Skills:\n  " + polished
 
