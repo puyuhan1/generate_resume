@@ -13,16 +13,20 @@ if input_mode == "Freeform (text box)":
         with st.spinner("Processing..."):
             structured = process_input(user_text)
             resume = generate_resume(structured)
-        st.subheader("🎯 Generated Resume")
+            st.session_state["structured"] = structured  # ✅ Store it
+        st.subheader("Generated Resume")
         st.text(resume)
     if st.button("Generate Cover Letter"):
         job_title = st.text_input("Target Job Title (optional)")
         company = st.text_input("Target Company (optional)")
-
-        with st.spinner("Generating cover letter..."):
-            cover_letter = generate_cover_letter(structured, job_title, company)
-        st.subheader("📬 Cover Letter")
-        st.text(cover_letter)
+        if "structured" in st.session_state:
+            with st.spinner("Generating cover letter..."):
+                cover_letter = generate_cover_letter(st.session_state["structured"], job_title, company)
+            st.subheader("📬 Cover Letter")
+            #st.text(cover_letter)
+            st.markdown(f"```\n{cover_letter}\n```")
+        else:
+            st.error("❗ Please generate the resume first before generating the cover letter.")
 else:
     with st.form("structured_form"):
         name = st.text_input("Full Name")
@@ -64,5 +68,7 @@ else:
 
             structured = build_structured_data(form_data)
             resume = generate_resume(structured)
-            st.subheader("🎯 Generated Resume")
-            st.text(resume)
+            st.subheader("Generated Resume")
+            #st.text(resume)
+            st.markdown(f"```\n{resume}\n```")
+
